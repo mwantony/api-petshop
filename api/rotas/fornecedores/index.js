@@ -59,4 +59,4 @@ roteador.delete('/:idFornecedor', async (req, res, proximo) => {
         proximo(erro)
     }
 })
-module.exports = roteador
+ = roteador
