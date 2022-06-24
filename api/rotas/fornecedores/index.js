@@ -1,15 +1,14 @@
 const roteador = require('express').Router()
 const TabelaFornecedor = require('./TabelaFornecedor')
 const Fornecedor = require('./Fornecedor')
-const NaoEncontrado = require('../../erros/NaoEncontrado')
-roteador.get('/', async (requisicao, res) => {
+roteador.get('/', async (req, res) => {
     const resultados = await TabelaFornecedor.listar()
     res.status(200)
     res.send(
         JSON.stringify(resultados)
     )
 })
-roteador.post('/', async (req, res) => {
+roteador.post('/', async (req, res, proximo) => {
     try {
         const dadosRecebidos = req.body
         const fornecedor = new Fornecedor(dadosRecebidos)
@@ -19,15 +18,10 @@ roteador.post('/', async (req, res) => {
             JSON.stringify(fornecedor)
         ) 
     } catch(erro) {
-        res.status(400)
-        res.send(
-            JSON.stringify({
-                mensagem: erro.message
-            })
-        )
+        proximo(erro)
     }
 })
-roteador.get('/:idFornecedor', async (req, res) => {
+roteador.get('/:idFornecedor', async (req, res, proximo) => {
     try {
         const id = req.params.idFornecedor
         const fornecedor = new Fornecedor({id: id})
@@ -37,12 +31,7 @@ roteador.get('/:idFornecedor', async (req, res) => {
             JSON.stringify(fornecedor)
         )
     } catch(erro) {
-        res.status(404)
-        res.send(
-            JSON.stringify({
-                mensagem: erro.message
-            })
-        )
+        proximo(erro)
     }
 })
 roteador.put('/:idFornecedor', async (req, res, proximo) => {
@@ -58,7 +47,7 @@ roteador.put('/:idFornecedor', async (req, res, proximo) => {
         proximo(erro)
     }
 })
-roteador.delete('/:idFornecedor', async (req, res) => {
+roteador.delete('/:idFornecedor', async (req, res, proximo) => {
     try {
         const id = req.params.idFornecedor
         const fornecedor = new Fornecedor({id: id})
@@ -67,13 +56,7 @@ roteador.delete('/:idFornecedor', async (req, res) => {
         res.status(204)
         res.end()
     } catch(erro) {
-        res.status(404)
-        res.send(
-            JSON.stringify({
-                mensagem: erro.message,
-                id: erro.idErro
-            })
-        )
+        proximo(erro)
     }
 })
 module.exports = roteador
